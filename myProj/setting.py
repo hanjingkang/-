@@ -27,8 +27,10 @@ class master_slaves():
 
 
 #数据存储数据库配置
-class sqlInfo():
-    host=""
-    port=""
-    password=""
+class MysqlInfo():
+    host="192.168.112.143"
+    port="3306"
+    password="Root_123"
+    user="root"
+    database="testdb"
     
