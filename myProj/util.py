@@ -1,4 +1,7 @@
 from hashlib import md5
+import random
+
+import requests
 
 def do_schedeler():
     print("do_schedeler")
@@ -153,3 +156,46 @@ def evaluate_system_performance():
 
 
 """
+
+
+
+
+def anti_antiSpider():
+    #禁用cookies
+    
+    from selenium import webdriver
+
+    browser = webdriver.Chrome()
+    browser.get('https://www.example.com')
+    browser.delete_all_cookies()
+    
+    #随机user_agent
+    user_agents = [
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36 Edge/16.16299',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.96 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64; rv:54.0) Gecko/20100101 Firefox/54.0',
+]
+
+    headers = {
+        'User-Agent': random.choice(user_agents),
+    }
+
+    response = requests.get(url, headers=headers)
+    
+    #添加Referer
+    headers = {
+    'User-Agent': random.choice(user_agents),
+    'Referer': 'https://www.example.com/',
+    }
+
+    response = requests.get(url, headers=headers)
+    
+    
+    #换IP
+    proxies = {
+    'http': 'http://10.10.1.10:3128',
+    'https': 'https://10.10.1.10:1080',
+    }
+
+    response = requests.get(url, proxies=proxies)
+        

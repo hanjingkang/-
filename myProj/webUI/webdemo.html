@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>爬虫系统性能比较</title>
+    <meta charset="UTF-8">
+    <style>
+        table,
+        th,
+        td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        
+        th,
+        td {
+            padding: 10px;
+        }
+        
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>爬虫系统性能比较</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>爬虫系统</th>
+                <th>速度</th>
+                <th>可扩展性</th>
+                <th>稳定性</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Scrapy</td>
+                <td>快</td>
+                <td>高</td>
+                <td>稳定</td>
+            </tr>
+            <tr>
+                <td>Beautiful Soup</td>
+                <td>慢</td>
+                <td>低</td>
+                <td>稳定</td>
+            </tr>
+            <tr>
+                <td>PySpider</td>
+                <td>较快</td>
+                <td>高</td>
+                <td>不稳定</td>
+            </tr>
+        </tbody>
+    </table>
+    <h2>爬虫系统性能比较图表</h2>
+    <p>以下是爬虫系统性能比较的图表：</p>
+    <canvas id="myChart"></canvas>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var ctx = document.getElementById('myChart').getContext('2d');
+        var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Scrapy', 'Beautiful Soup', 'PySpider'],
+                datasets: [{
+                    label: '速度',
+                    data: [90, 30, 70],
+                    backgroundColor: ['rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'
+                    ],
+                    borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+                    borderWidth: 1
+                }, {
+                    label: '可扩展性',
+                    data: [80, 20, 90],
+                    backgroundColor: ['rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'
+                    ],
+                    borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+                    borderWidth: 1
+                }]
+            }
+        })
+    </script>
