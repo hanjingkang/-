@@ -12,9 +12,9 @@ bookitem=Table('bookitem',meta,
               )
 
 
-#Base = declarative_base()
+Base = declarative_base()
 
-""" #mysql数据表，存书的具体内容
+#mysql数据表，存书的具体内容
 class bookItem(Base):
     __tablename__ = 'bookitem'
     bookname = Column(String, primary_key=True, autoincrement=True)
@@ -24,4 +24,3 @@ class bookItem(Base):
     def to_dict(self):
         return {c.name: getattr(self, c.name, None) for c in self.__table__.columns}
     Base.to_dict = to_dict
- """

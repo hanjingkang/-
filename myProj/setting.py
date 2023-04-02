@@ -17,13 +17,18 @@ class redisInformation():
     port = 6379
     password = ""
     db_ID = 0
-    
+
+pool = redis.ConnectionPool(host=redisInformation.host,db=redisInformation.db_ID,port=redisInformation.port)   #实现一个连接池
+redisHandel = redis.Redis(connection_pool=pool)
+hashname="bookitem"
 
 
 # 主从ip池
 class master_slaves():
-    masterIP = ""
-    slavesIP_list = []
+    masterIP = "192.168.112.143"
+    masterPort=8000
+    slavesIP_list = ["192.168.112.3","192.168.112.4","192.168.112.5"]
+    slavesPort_list=[8000,8000,8000]
 
 
 #数据存储数据库配置
