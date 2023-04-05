@@ -79,11 +79,18 @@ def cal_sysLoad():
     return score
 
 
-def server_task(clientsock,buffsize):
+#1.负责跟slave端交互，分发starturl和分配的url
+#2.负责跟web交互，返回系统负载情况等
+#3.接收与发送：接收值为1--开始信号，
+# 发送starturl，delay(5s),发送分配的url，
+# 接收3--（循环）发送sysScore，
+# 接收4--接收sysScore,返回ok
+def server_task(clientsock,buffsize,startNum):
     while True:  
         recvdata=clientsock.recv(buffsize).decode('utf-8')
-        if recvdata=='exit' or not recvdata:
-            break
+        if recvdata=='1':
+            print("start system")
+            
         senddata=recvdata+'from sever'
         clientsock.send(senddata.encode())
     clientsock.close()
@@ -91,7 +98,7 @@ def server_task(clientsock,buffsize):
 
 
 def server(host,port):
-    HOST = host  # HOST 变量是空白的，表示它可以使用任何可用的地址。
+    HOST = host  
     PORT = port
     BUFSIZ = 1024
     ADDR = (HOST, PORT)
@@ -103,10 +110,20 @@ def server(host,port):
     while True:
         clientsock,clientaddress=tcpSerSock.accept()
         print('connect from:',clientaddress)
-        #传输数据都利用clientsock，和s无关
-        t=threading.Thread(target=server_task,args=(clientsock,BUFSIZ))  #t为新创建的线程
+        t=threading.Thread(target=server_task,args=(clientsock,BUFSIZ,startNum))  #t为新创建的线程
         t.start()
     tcpSerSock.close()
+
+
+
+
+
+
+
+
+
+
+
 
 
 def client_task_send2redis(starturl):

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>曲线图</title>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<style>
+		canvas{
+			-moz-user-select: none;
+			-webkit-user-select: none;
+			-ms-user-select: none;
+		}
+	</style>
+</head>
+<body>
+	<canvas id="myChart"></canvas>
+
+	<script>
+		var ctx = document.getElementById('myChart').getContext('2d');
+		var myChart = new Chart(ctx, {
+			type: 'line',
+			data: {
+				labels: ['0s', '5s', '10s', '15s', '20s', '25s', '30s'],
+				datasets: [{
+					label: '吞吐量',
+					data: [0, 10, 20, 30, 40, 50, 60],
+					borderColor: 'rgba(255, 99, 132, 1)',
+					backgroundColor: 'rgba(255, 99, 132, 0.2)',
+					borderWidth: 1
+				}]
+			},
+			options: {
+				scales: {
+					yAxes: [{
+						ticks: {
+							beginAtZero: true
+						}
+					}]
+				}
+			}
+		});
+	</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>柱状图</title>
+	<script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+	<h1>柱状图</h1>
+	<div id="chart"></div>
+	<button id="btn">获取数据</button>
+
+	<script>
+		$(document).ready(function() {
+			$("#btn").click(function() {
+				$.ajax({
+					url: "your-server-url", // 更换为您的服务器URL
+					type: "GET",
+					dataType: "json",
+					success: function(result) {
+						var data = result.data; // 获取服务器返回的数据
+						drawChart(data); // 调用 drawChart 函数来画柱状图
+					},
+					error: function(xhr, status, error) {
+						console.log("请求出错: " + error);
+					}
+				});
+			});
+		});
+
+		function drawChart(data) {
+			var options = {
+				chart: {
+					type: 'bar'
+				},
+				series: [{
+					data: data // 数据数组
+				}],
+				xaxis: {
+					categories: ['数据1', '数据2', '数据3', '数据4', '数据5'] // 类别数组
+				}
+			};
+
+			var chart = new ApexCharts(document.querySelector("#chart"), options); // 使用 ApexCharts 库来画柱状图
+			chart.render(); // 渲染图表
+		}
+	</script>
+</body>
+</html>

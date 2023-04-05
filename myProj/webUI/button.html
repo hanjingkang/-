@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>爬虫</title>
+    <style>
+        body {
+            background-color: #f2f2f2;
+        }
+        
+        button {
+            background-color: #2E8B57;
+            color: #fff;
+            border-radius: 8px;
+            box-shadow: 2px 2px 4px #888888;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        
+        .chart {
+            width: 500px;
+            height: 300px;
+            background-color: white;
+            margin: 20px auto;
+            padding: 10px;
+            box-shadow: 0px 0px 10px #999;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="startButton" onclick="startCrawler()">开始爬虫</button>
+    <button id="stopButton" onclick="stopCrawler()">结束爬虫</button>
+
+    <div class="chart">
+        <canvas id="myChart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var chartData = [12, 19, 3, 5, 2, 3]; // 自定义测试数据
+
+        var myChart = new Chart(document.getElementById('myChart'), {
+            type: 'bar',
+            data: {
+                labels: ['数据1', '数据2', '数据3', '数据4', '数据5', '数据6'],
+                datasets: [{
+                    label: '爬虫数据',
+                    data: chartData,
+                    backgroundColor: '#008080'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }]
+                }
+            }
+        });
+
+        var intervalId;
+
+        function startCrawler() {
+            intervalId = setInterval(function() {
+                // 更新数据
+                chartData = chartData.map(function(num) {
+                    return num + Math.floor(Math.random() * 10);
+                });
+
+                // 更新柱状图
+                myChart.data.datasets[0].data = chartData;
+                myChart.update();
+            }, 1000);
+        }
+
+        function stopCrawler() {
+            clearInterval(intervalId);
+            chartData = [0, 0, 0, 0, 0, 0];
+            myChart.data.datasets[0].data = chartData;
+            myChart.update();
+        }
+    </script>
+</body>
+
+</html>
