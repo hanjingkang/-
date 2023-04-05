@@ -1,0 +1,368 @@
+<html>
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>分布式爬虫</title>
+    <style>
+        /* 样式可以根据您的需要进行自定义 */
+        
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            flex: 1;
+            background-color: #fffdfd00;
+        }
+        
+        .row1 {
+            background-color: #fffdfd00;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        
+        #tabs {
+            display: flex;
+            align-items: center;
+            background-color: #143245;
+            color: #fff;
+            height: 50px;
+        }
+        
+        #tabs a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px;
+        }
+        
+        #tabs a:hover {
+            background-color: #555;
+        }
+        
+        #main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 50px);
+        }
+        
+        #buttons {
+            margin-bottom: 30px;
+        }
+        
+        #buttons button {
+            cursor: pointer;
+            background-color: #186f8c;
+            color: #fff;
+            border-radius: 8px;
+            box-shadow: 2px 2px 4px #888888;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        
+        .chartname {
+            font-size: x-small;
+        }
+        
+        #buttons button:hover {
+            background-color: #81bec7;
+        }
+        
+        #charts {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: calc(100% - 100px);
+        }
+        
+        #chartblock {
+            display: flex;
+            align-items: center;
+        }
+        
+        #query {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: calc(100vh - 50px);
+        }
+        
+        #query form {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #query input {
+            padding: 10px;
+            margin: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+        }
+        
+        #query button {
+            padding: 10px;
+            margin: 10px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .output {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .textbox {
+            padding: 10px;
+            border: 1px solid #d3d3d3;
+            border-radius: 5px;
+            width: 80%;
+            height: 50px;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+            box-shadow: none;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        }
+        
+        #query button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="tabs">
+        <a href="#main-tab">性能监控</a>
+        <a href="#query-tab">查询页面</a>
+    </div>
+    <div id="main-tab">
+        <div id="main">
+            <div class="row1">
+                <div id="buttons">
+                    <button id="start_spider_btn" onclick="startBtn()">开始爬虫</button>
+                    <button id="reset_btn" onclick="stop()">停止/重置</button>
+                    <div class="output">
+                        <textarea id="output-box" cols="20" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="chartblock">
+                    <div id="charts">
+                        <canvas id="myChart1"></canvas>
+                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    </div>
+                    <div>
+                        <p class="chartname">slave1</p>
+                    </div>
+                </div>
+
+                <div class="chartblock">
+                    <div id="charts">
+                        <canvas id="myChart2"></canvas>
+                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    </div>
+                    <div>
+                        <p class="chartname">slave2</p>
+                    </div>
+                </div>
+                <div class="chartblock">
+                    <div id="charts">
+                        <canvas id="myChart3"></canvas>
+                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    </div>
+                    <div>
+                        <p class="chartname">slave3</p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="row">
+                <div class="chartblock">
+                    <div id="charts">
+                        <canvas id="myChart4"></canvas>
+                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    </div>
+                    <div>
+                        <p class="chartname">redis</p>
+                    </div>
+                </div>
+
+                <div class="chartblock">
+                    <div id="charts">
+                        <canvas id="myChart5"></canvas>
+                        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                    </div>
+                    <div>
+                        <p class="chartname">mysql储量</p>
+                    </div>
+                </div>
+
+
+            </div>
+            <div class="row1">
+
+            </div>
+        </div>
+    </div>
+    <div id="query-tab">
+        <div id="query">
+            <form>
+                <label for="name">书名:</label>
+                <textarea id="input-box" cols="30" rows="1"></textarea><br>
+                <label for="output-box">查询结果:</label>
+                <textarea id="output-box" cols="50" rows="10"></textarea>
+                <button type="submit">查询</button>
+            </form>
+        </div>
+    </div>
+    <script>
+        Slavechartconfig = {
+            type: 'bar',
+            data: {
+                labels: ['CPU_usage', 'disk_usage', 'memory_usage', 'netspeed'],
+                datasets: [{
+                    label: "百分比",
+                    data: [0, 0, 0, 0],
+                    backgroundColor: ['rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'
+                    ],
+                    borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+                    borderWidth: 1
+                }]
+            }
+        }
+        SQLchartconfig = {
+            type: 'bar',
+            data: {
+                labels: ['slave1', 'slave2', 'slave3'],
+                datasets: [{
+                    label: "百分比",
+                    data: [0, 0, 0],
+                    backgroundColor: ['rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'
+                    ],
+                    borderColor: ['rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)', 'rgba(255, 206, 86, 1)'],
+                    borderWidth: 1
+                }]
+            }
+        }
+        redischartconfig = {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'url数量',
+                    data: [],
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderWidth: 1
+                }]
+            }
+        }
+
+        var chart = new Chart(document.getElementById('myChart1').getContext('2d'), Slavechartconfig);
+        var chart2 = new Chart(document.getElementById('myChart2').getContext('2d'), Slavechartconfig);
+        var chart3 = new Chart(document.getElementById('myChart3').getContext('2d'), Slavechartconfig);
+        var chart4 = new Chart(document.getElementById('myChart4').getContext('2d'), redischartconfig);
+        var chart5 = new Chart(document.getElementById('myChart5').getContext('2d'), SQLchartconfig);
+    </script>
+    <script>
+        const mainTab = document.getElementById("main-tab");
+        const queryTab = document.getElementById("query-tab");
+
+        // 初始化，默认显示主页面
+        queryTab.style.display = "none";
+
+        window.addEventListener("hashchange", () => {
+            if (location.hash === "#main-tab") {
+                mainTab.style.display = "block";
+                queryTab.style.display = "none";
+            } else if (location.hash === "#query-tab") {
+                mainTab.style.display = "none";
+                queryTab.style.display = "block";
+            }
+        });
+    </script>
+    <script>
+        var id;
+        var time = 0;
+
+        function sendData() {
+            // 获取输入框中的内容
+            var inputVal = document.getElementById("input-box").value;
+
+            // 发送 HTTP POST 请求
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "http://127.0.0.1:8000/data", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.send(JSON.stringify({
+                data: inputVal
+            }));
+
+            // 监听 HTTP 响应
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // 更新输出框中的内容
+                    var outputBox = document.getElementById("output-box");
+                    let dataset = [];
+                    let responseStr = xhr.responseText;
+                    //报文类型[[slave1 * 4], [slave2 * 4], [slave3 * 4], [redis * 1], [mysql * 3]]
+                    dataset = responseStr.replace("[", "").replace("]", "").split(",").map(Number);
+                    outputBox.innerHTML = dataset;
+                    console.log("dataset:", dataset);
+                    // 更新柱状图
+                    chart.data.datasets[0].data = dataset.slice(0, 4);
+                    // console.log("chart1:", dataset.slice(0, 4));
+                    chart.update();
+                    chart2.data.datasets[0].data = dataset.slice(4, 8);
+                    //console.log("chart2:", dataset.slice(4, 8));
+                    chart2.update();
+                    chart3.data.datasets[0].data = dataset.slice(8, 12);
+                    //console.log("chart3:", dataset.slice(8, 12));
+                    chart3.update();
+                    chart4.data.datasets[0].data.push(dataset[12]);
+                    chart4.data.labels.push(time + "s")
+                        //console.log("chart4:", time + "s", dataset[12]);
+                    time += 1;
+                    chart4.update();
+                    chart5.data.datasets[0].data = dataset.slice(13, 16);
+                    //console.log("chart5:", dataset.slice(13, 16));
+                    chart5.update();
+                }
+            }
+        }
+
+        function stop() {
+            clearInterval(id)
+        }
+
+        function startBtn() {
+            id = setInterval(function() {
+                sendData()
+            }, 500)
+        }
+    </script>
+</body>
+
+</html>

@@ -32,6 +32,7 @@
 <body>
     <button id="startButton" onclick="startCrawler()">开始爬虫</button>
     <button id="stopButton" onclick="stopCrawler()">结束爬虫</button>
+    <button id="btn">获取数据</button>
 
     <div class="chart">
         <canvas id="myChart"></canvas>
@@ -39,6 +40,39 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
+        $(document).ready(function() {
+            $("#btn").click(function() {
+                $.ajax({
+                    url: "192.168.112.143", // 更换为您的服务器URL
+                    type: "GET",
+                    dataType: "json",
+                    success: function(result) {
+                        var data = result.data; // 获取服务器返回的数据
+                        drawChart(data); // 调用 drawChart 函数来画柱状图
+                    },
+                    error: function(xhr, status, error) {
+                        console.log("请求出错: " + error);
+                    }
+                });
+            });
+        });
+
+        function drawChart(data) {
+            var options = {
+                chart: {
+                    type: 'bar'
+                },
+                series: [{
+                    data: data // 数据数组
+                }],
+                xaxis: {
+                    categories: ['数据1', '数据2', '数据3', '数据4', '数据5'] // 类别数组
+                }
+            };
+
+            var chart = new ApexCharts(document.querySelector("#chart"), options); // 使用 ApexCharts 库来画柱状图
+            chart.render(); // 渲染图表
+        }
         var chartData = [12, 19, 3, 5, 2, 3]; // 自定义测试数据
 
         var myChart = new Chart(document.getElementById('myChart'), {
@@ -89,3 +123,47 @@
 </body>
 
 </html>
+
+<!-- <!DOCTYPE html>
+<html>
+
+<head>
+    <title>发送和接收信息</title>
+</head>
+
+<body>
+    <h1>发送和接收信息</h1>
+    <label for="input-box">输入信息：</label>
+    <input type="text" id="input-box">
+    <br><br>
+    <label for="output-box">输出信息：</label>
+    <textarea id="output-box" cols="30" rows="10"></textarea>
+    <br><br>
+    <button onclick="sendData()">发送</button>
+
+    <script>
+        function sendData() {
+            // 获取输入框中的内容
+            var inputVal = document.getElementById("input-box").value;
+
+            // 发送 HTTP POST 请求
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "http://127.0.0.1:8000/data", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.send(JSON.stringify({
+                data: inputVal
+            }));
+
+            // 监听 HTTP 响应
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // 更新输出框中的内容
+                    var outputBox = document.getElementById("output-box");
+                    outputBox.innerHTML = xhr.responseText;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html> -->

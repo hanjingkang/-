@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>网页模板</title>
+    <style>
+        /* 样式表 */
+        
+        body {
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            width: 80%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            text-align: center;
+        }
+        
+        button {
+            padding: 10px;
+            background-color: lightblue;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: blue;
+            color: white;
+        }
+        
+        .chart {
+            width: 30%;
+            height: 300px;
+            margin: 20px 10px;
+            display: inline-block;
+        }
+        
+        .chart-title {
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>网页模板</h1>
+        <button id="button">点击更新数据</button>
+        <div class="chart">
+            <div class="chart-title">图表 1</div>
+            <canvas id="chart1"></canvas>
+        </div>
+        <div class="chart">
+            <div class="chart-title">图表 2</div>
+            <canvas id="chart2"></canvas>
+        </div>
+        <div class="chart">
+            <div class="chart-title">图表 3</div>
+            <canvas id="chart3"></canvas>
+        </div>
+    </div>
+    <!-- 引入Chart.js库 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.3.2/chart.min.js"></script>
+    <script>
+        // 在这里编写JavaScript代码
+        const button = document.getElementById('button');
+        // 点击按钮时更新数据
+        button.addEventListener('click', function() {
+            updateChartData();
+        });
+        // 初始化图表数据
+        const initialData = {
+            labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+            datasets: [{
+                label: '数据 1',
+                data: [65, 59, 80, 81, 56, 55, 40],
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        };
+        // 初始化图表配置
+        const chartConfig = {
+            type: 'bar',
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        };
+        // 初始化图表对象
+        const chart1 = new Chart(document.getElementById('chart1'), chartConfig);
+        const chart2 = new Chart(document.getElementById('chart2'), chartConfig);
+        const chart3 = new Chart(document.getElementById('chart3'), chartConfig);
+        // 更新图表数据
+        function updateChartData() {
+            // 模拟新的数据
+            const newData1 = [28, 48, 40, 19, 86, 27, 90];
+            const newData2 = [12, 5, 18, 22, 35, 30, 10];
+            const newData3 = [45, 32, 12, 60, 70, 20, 38];
+            // 更新图表数据
+            chart1.data.datasets[0].data = newData1;
+            chart2.data.datasets[0].data = newData2;
+            chart3.data.datasets[0].data = newData3;
+            // 刷新图表
+            chart1.update();
+            chart2.update();
+            chart3.update();
+        }
+    </script>
+</body>
+
+</html>

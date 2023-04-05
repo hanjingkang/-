@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>网页布局示例</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        
+        .row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            background-color: #f0f0f0;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .button {
+            background-color: #2E8B57;
+            color: #fff;
+            border-radius: 8px;
+            box-shadow: 2px 2px 4px #888888;
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-right: 10px;
+        }
+        
+        .button:hover {
+            background-color: #0062cc;
+        }
+        
+        .chart {
+            width: 500px;
+            height: 300px;
+            background-color: white;
+            margin: 20px auto;
+            padding: 10px;
+            box-shadow: 0px 0px 10px #999;
+        }
+        
+        .bar {
+            height: 200px;
+            width: 40px;
+            background-color: #007bff;
+            margin-top: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+        
+        .bar span {
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        
+        .output {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+        
+        .textbox {
+            padding: 10px;
+            border: 1px solid #d3d3d3;
+            border-radius: 5px;
+            width: 80%;
+            height: 50px;
+            font-size: 16px;
+            resize: none;
+            outline: none;
+            box-shadow: none;
+            transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+        }
+        
+        .textbox:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 .2rem rgba(0, 123, 255, .25);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="buttons">
+                <button class="button">开始爬虫</button>
+                <button class="button">重置</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="chart">
+                <p>1</p>
+                <canvas id="myChart"></canvas>
+            </div>
+            <div class="chart">
+                <p>2</p>
+                <canvas id="myChart"></canvas>
+            </div>
+            <div class="chart">
+                <canvas id="myChart"></canvas>
+            </div>
+        </div>
+        <div class="row">
+            <div class="output">
+                <textarea class="textbox" placeholder="在此输入文本信息"></textarea>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
