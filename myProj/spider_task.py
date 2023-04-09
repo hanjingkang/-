@@ -16,7 +16,7 @@ testContenturl=""
 header = {
     'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Edg/107.0.1418.42'
 }
-
+#获取初始urlnum，用来分配给slave
 def gainStartUrl(starturl,slaveNums=3):
     print("gainStartUrl")
     page = requests.get(url=starturl, headers=header)
@@ -26,11 +26,11 @@ def gainStartUrl(starturl,slaveNums=3):
     allcount = re.findall("&gt;&gt;</a><a href=.*>(.*)</a>", section)[0]
     reslist=[]
     for i in range(0,slaveNums):
-        reslist.append(int((int(allcount)/slaveNums)*i))
+        reslist.append(int((int(allcount)/slaveNums)*i+1))
     return reslist
 
-
-def gainBOOKurl(indexurl, header):
+#获取该索引页的所有bookurl，md5入库redis
+def gainBOOKurl(indexurl, header=header):
     print("gainBOOKurl")
     page = requests.get(url=indexurl, headers=header)
     html = etree.HTML(page.text)
@@ -87,7 +87,7 @@ def gainCONTENT(chapterurl):
 def gainUrl(starturlnum):
     print("收集url")
     baseurl = "http://www.jinyongwang.com/s/"
-    start=starturl
+    start=starturlnum
     while start<30000:
         gainBOOKurl(indexurl=(baseurl+start+'/'),header=header)
         start+=1
@@ -104,6 +104,6 @@ def gainPage(url,bookname):
     for i in chaplist:
         content=[i[0],gainCONTENT(i[1])]
         contentlist.append(content)
-    return [bookname,contentlist]
+    return bookname,contentlist
         
-    
+   

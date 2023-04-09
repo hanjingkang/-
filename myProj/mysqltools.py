@@ -15,18 +15,19 @@ class mysqltools():
         self.user=user
         self.DBsession=None
         self.session=None
+        self.engine=None
         
     def connect(self):
-        engine = create_engine('mysql+pymysql://%s:%s@%s:%s/%s'%
+        self.engine = create_engine('mysql+pymysql://%s:%s@%s:%s/%s'%
                                (self.user,self.password,self.host,self.port,self.database))
-        if not database_exists(engine.url):
-            create_database(engine.url)
+        if not database_exists(self.engine.url):
+            create_database(self.engine.url)
         print("connect sucess")
         #Base.metadata.create_all(engine)
-        self.DBsession=sessionmaker(bind=engine)
+        self.DBsession=sessionmaker(bind=self.engine)
         #创建数据表
         try:
-            bookitem.create(bind=engine)
+            bookitem.create(bind=self.engine)
             print("创建表")
         except:
             print("找到表")
@@ -40,6 +41,9 @@ class mysqltools():
         data=bookItem(bookname=bookname,authorname=authorname,chapternum=chapternum,content=content)
         self.session.add(data)
         print("add bookitem",bookname,"sucessful")
+    def deleteTable(self):
+         self.engine.execute(str('DROP TABLE IF EXISTS bookitem;'))
+         print("delete bookitem ok")
         
     def commitsession(self):
         self.session.commit()
@@ -53,11 +57,11 @@ mytool=mysqltools(host=MysqlInfo.host,port=MysqlInfo.port,
                   password=MysqlInfo.password,database=MysqlInfo.database,
                   user=MysqlInfo.user)
 #item=bookItem(bookname="三体",authorname="刘慈欣",chapternum=333,content="三体人入侵地球")
-mytool.connect()
+""" mytool.connect()
 
 mytool.opensession()
 mytool.addbook(bookname="三体",authorname="刘慈欣",chapternum=333,content="三体人入侵地球")
 mytool.commitsession()
 mytool.closesession()
-
+ """
     

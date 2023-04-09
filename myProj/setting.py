@@ -4,8 +4,8 @@ import redis
 
 # 项目属性配置
 class projectInfo:
-    ifmaster = 0
-    masterIP = ""
+    ifmaster = 1
+    masterIP = "192.168.112.143"
     ifslave = 0
     slaveIP = ""
 
@@ -18,7 +18,7 @@ class redisInformation():
     password = ""
     db_ID = 0
 
-pool = redis.ConnectionPool(host=redisInformation.host,db=redisInformation.db_ID,port=redisInformation.port)   #实现一个连接池
+pool = redis.ConnectionPool(host=redisInformation.host,db=redisInformation.db_ID,port=redisInformation.port,decode_responses=True)   #实现一个连接池
 redisHandel = redis.Redis(connection_pool=pool)
 hashname="bookitem"
 
