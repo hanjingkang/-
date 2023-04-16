@@ -159,8 +159,11 @@
             <div class="row1">
                 <div id="buttons">
                     <button id="test_connect" onclick="test()">连接爬虫</button>
+                    <button id="start_gainurl_btn" onclick="urlBtn()">收集url</button>
+                    <button id="start_gainurl_btn" onclick="checkstatus()">检查状态</button>
                     <button id="start_spider_btn" onclick="startBtn()">开始爬虫</button>
-                    <button id="reset_btn" onclick="stop()">停止/重置</button>
+                    <button id="reset_btn" onclick="stop()">停止</button>
+                    <button id="reset_btn" onclick="reset()">重置</button>
                     <div class="output">
                         <textarea id="output-box" cols="20" rows="3"></textarea>
                     </div>
@@ -173,7 +176,7 @@
                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                     </div>
                     <div>
-                        <p class="chartname">slave1</p>
+                        <p class="chartname">CPU_usage</p>
                     </div>
                 </div>
 
@@ -183,7 +186,7 @@
                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                     </div>
                     <div>
-                        <p class="chartname">slave2</p>
+                        <p class="chartname">netspeed</p>
                     </div>
                 </div>
                 <div class="chartblock">
@@ -192,9 +195,10 @@
                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                     </div>
                     <div>
-                        <p class="chartname">slave3</p>
+                        <p class="chartname">memory_usage</p>
                     </div>
                 </div>
+
 
             </div>
             <div class="row">
@@ -214,7 +218,9 @@
                         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
                     </div>
                     <div>
-                        <p class="chartname">mysql储量</p>
+                        <p class="chartname">disk_usage</p>
+                        </p>
+                        </p>
                     </div>
                 </div>
 
@@ -240,10 +246,10 @@
         Slavechartconfig = {
             type: 'bar',
             data: {
-                labels: ['CPU_usage', 'disk_usage', 'memory_usage', 'netspeed'],
+                labels: ['slave1', 'slave2', 'slave3'],
                 datasets: [{
                     label: "百分比",
-                    data: [0, 0, 0, 0],
+                    data: [0, 0, 0],
                     backgroundColor: ['rgba(255, 99, 132, 0.2)',
                         'rgba(54, 162, 235, 0.2)', 'rgba(255, 206, 86, 0.2)'
                     ],
@@ -309,13 +315,36 @@
         var time = 0;
         var inputVal = document.getElementById("input-box").value;
 
-        function sendData() {
+        function urlBtn() {
             // 获取输入框中的内容
             var inputVal = document.getElementById("input-box").value;
 
             // 发送 HTTP POST 请求
             var xhr = new XMLHttpRequest();
-            xhr.open("GET", "http://127.0.0.1:8000/start", true);
+            xhr.open("GET", "http://127.0.0.1:8000/url", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.send(JSON.stringify({
+                data: inputVal
+            }));
+            // 监听 HTTP 响应
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // 更新输出框中的内容
+                    var outputBox = document.getElementById("output-box");
+                    outputBox.innerHTML = xhr.responseText;
+
+                }
+            }
+
+        }
+
+        function checkstatus() {
+            // 获取输入框中的内容
+            var inputVal = document.getElementById("input-box").value;
+
+            // 发送 HTTP POST 请求
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "http://127.0.0.1:8000/checkstatus", true);
             xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
             xhr.send(JSON.stringify({
                 data: inputVal
@@ -327,33 +356,12 @@
                 if (xhr.readyState === 4 && xhr.status === 200) {
                     // 更新输出框中的内容
                     var outputBox = document.getElementById("output-box");
-                    let dataset = [];
-                    let responseStr = xhr.responseText;
-                    //报文类型[[slave1 * 4], [slave2 * 4], [slave3 * 4], [redis * 1], [mysql * 3]]
-                    dataset = responseStr.replace("[", "").replace("]", "").split(",").map(Number);
-                    outputBox.innerHTML = dataset;
-                    console.log("dataset:", dataset);
-                    // 更新柱状图
-                    chart.data.datasets[0].data = dataset.slice(0, 4);
-                    // console.log("chart1:", dataset.slice(0, 4));
-                    chart.update();
-                    chart2.data.datasets[0].data = dataset.slice(4, 8);
-                    //console.log("chart2:", dataset.slice(4, 8));
-                    chart2.update();
-                    chart3.data.datasets[0].data = dataset.slice(8, 12);
-                    //console.log("chart3:", dataset.slice(8, 12));
-                    chart3.update();
-                    chart4.data.datasets[0].data.push(dataset[12]);
-                    chart4.data.labels.push(time + "s")
-                        //console.log("chart4:", time + "s", dataset[12]);
-                    time += 1;
-                    chart4.update();
-                    chart5.data.datasets[0].data = dataset.slice(13, 16);
-                    //console.log("chart5:", dataset.slice(13, 16));
-                    chart5.update();
+                    outputBox.innerHTML = "已爬取url:" + xhr.responseText;
+
                 }
             }
         }
+
 
         function test() {
             var xhr = new XMLHttpRequest();
@@ -376,6 +384,25 @@
         }
 
         function stop() {
+            clearInterval(id)
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", "http://127.0.0.1:8000/stop", true);
+            xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+            xhr.send(JSON.stringify({
+                data: inputVal
+            }));
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    // 更新输出框中的内容
+                    var outputBox = document.getElementById("output-box");
+                    outputBox.innerHTML = xhr.responseText;
+
+                }
+            }
+        }
+
+        function reset() {
             clearInterval(id)
             var xhr = new XMLHttpRequest();
             xhr.open("POST", "http://127.0.0.1:8000/reset", true);
@@ -411,27 +438,27 @@
                         var outputBox = document.getElementById("output-box");
                         responseStr = xhr.responseText;
                         if (responseStr != "start system sucessful!") {
-                            //报文类型[[slave1 * 4], [slave2 * 4], [slave3 * 4], [redis * 1], [mysql * 3]]
+                            //报文类型[[CPU_usage * 3], [netspeed * 3], [memory_usage * 3], [redis * 1], [disk_usage * 3]]
                             dataset = responseStr.replace("[", "").replace("]", "").split(",").map(Number);
                             outputBox.innerHTML = dataset;
                             outputBox.innerHTML = xhr.responseText;
                             //console.log("dataset:", dataset);
                             // 更新柱状图
-                            chart.data.datasets[0].data = dataset.slice(0, 4);
+                            chart.data.datasets[0].data = dataset.slice(0, 3);
                             // console.log("chart1:", dataset.slice(0, 4));
                             chart.update();
-                            chart2.data.datasets[0].data = dataset.slice(4, 8);
+                            chart2.data.datasets[0].data = dataset.slice(3, 6);
                             //console.log("chart2:", dataset.slice(4, 8));
                             chart2.update();
-                            chart3.data.datasets[0].data = dataset.slice(8, 12);
+                            chart3.data.datasets[0].data = dataset.slice(6, 9);
                             //console.log("chart3:", dataset.slice(8, 12));
                             chart3.update();
-                            chart4.data.datasets[0].data.push(dataset[12]);
+                            chart4.data.datasets[0].data.push(dataset[9]);
                             chart4.data.labels.push(time + "s")
                                 //console.log("chart4:", time + "s", dataset[12]);
                             time += 1;
                             chart4.update();
-                            chart5.data.datasets[0].data = dataset.slice(13, 16);
+                            chart5.data.datasets[0].data = dataset.slice(10, 13);
                             //console.log("chart5:", dataset.slice(13, 16));
                             chart5.update();
                         } else {
@@ -440,7 +467,7 @@
 
                     }
                 }
-            }, 1000)
+            }, 3000)
         }
     </script>
 </body>

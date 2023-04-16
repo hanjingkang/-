@@ -5,7 +5,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 globalClient=None
-ifstartwork=None
+ifstartwork=False
 
 CORS(app, resources=r'/*')
 # 假设这是一些爬虫获取的数据
@@ -26,6 +26,30 @@ def test_connect():
     print(globalClient)
     return data
 
+
+@app.route('/url', methods=['GET'])
+def url():
+    # 在这里进行停止、重置的操作
+    global globalClient
+    global ifstartwork
+    if(globalClient==None):
+        return "爬虫未连接"
+    globalClient.send(bytes("5", 'utf-8'))
+    data = globalClient.recv(1024)
+    print(data)
+    return data
+
+@app.route('/checkstatus', methods=['GET'])
+def checkstatus():
+    # 在这里进行停止、重置的操作
+    global globalClient
+    global ifstartwork
+    if(globalClient==None):
+        return "爬虫未连接"
+    globalClient.send(bytes("6", 'utf-8'))
+    data = globalClient.recv(1024)
+    print("check redis url nums:",data)
+    return data
 
 @app.route('/start', methods=['GET'])
 def start_spider():
@@ -50,20 +74,20 @@ def start_spider():
     return data
 
 
-""" @app.route('/data', methods=['GET'])
-def get_data():
-    # 在这里返回slave以及数据库各项性能指标，报文类型[[slave1*4],[slave2*4],[slave3*4],[redis*1],[mysql*3]]
-    res=[]
-    for i in range(0,4):
-        res.append(random.randrange(1,100))
-        res.append(random.randrange(1,100))
-        res.append(random.randrange(1,100))
-    res.append(random.randrange(1,10))
-    for i in range(0,3):
-        res.append(random.randrange(1,100))
-    print("web ask",res)
-    return jsonify(res) """
 
+@app.route('/stop', methods=['POST'])
+def stop():
+    # 在这里进行停止、重置的操作
+    global globalClient
+    global ifstartwork
+    if(globalClient==None):
+        return "爬虫未连接"
+
+    globalClient.send(bytes("7", 'utf-8'))
+    data = globalClient.recv(1024)
+    print(data)
+    ifstartwork==False
+    return data
 
 @app.route('/reset', methods=['POST'])
 def reset_data():
@@ -71,7 +95,7 @@ def reset_data():
     global globalClient
     global ifstartwork
     if(globalClient==None):
-        return "爬虫已关闭"
+        return "爬虫未连接"
 
     globalClient.send(bytes("q", 'utf-8'))
     data = globalClient.recv(1024)
@@ -80,6 +104,8 @@ def reset_data():
     globalClient=None
     ifstartwork==False
     return data
+
+
 
 
 """ @app.route('/query', methods=['GET'])

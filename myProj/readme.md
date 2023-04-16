@@ -11,12 +11,14 @@ lxml
 psutil--报错python.h:yum install python3-devel 
 selenium
 requests
+pymysql
 No module named 'sqlalchemy' 
     --python3 -m pip install --upgrade pip
     pip3 install gevent==1.4.0
 
-
-
+lxml
+sqlalchemy
+sqlalchemy_utils
 
 其他报错：
 1

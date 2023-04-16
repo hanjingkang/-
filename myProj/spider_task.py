@@ -29,8 +29,23 @@ def gainStartUrl(starturl,slaveNums=3):
         reslist.append(int((int(allcount)/slaveNums)*i+1))
     return reslist
 
+
+def cal_md5(url):
+    md5_url = md5(url.encode('utf8')).hexdigest()
+    print(md5_url)  # 2f7108ac307fd06f5995948f35a70f2f
+    return md5_url
+def pushinredis(key, value, redisHandle, hashname):
+    if (redisHandle.hget(hashname, key)):
+        print("key:", key, "already exits")
+        return False
+    else:
+        redisHandle.hset(hashname, key, str(value))
+        print("save key:", key)
+
 #获取该索引页的所有bookurl，md5入库redis
 def gainBOOKurl(indexurl, header=header):
+    global redisHandel
+    global hashname
     print("gainBOOKurl")
     page = requests.get(url=indexurl, headers=header)
     html = etree.HTML(page.text)
@@ -40,9 +55,9 @@ def gainBOOKurl(indexurl, header=header):
         bookurl = re.findall("<a href=(.*)><h2>.*</h2></a>", section)[0]
         bookname = re.findall("<a href=.*><h2>(.*)</h2></a>", section)[0]
         bookurl = baseurl+re.sub("\"", "", bookurl)
-        print(bookname, bookurl)
+        #print(bookname, bookurl)
         md5key=cal_md5(bookurl)
-        value=bookname+"[{}]".format(bookurl)
+        value=bookname+"&&{}".format(bookurl)
         pushinredis(md5key,value,redisHandel,hashname)
 
 
@@ -85,11 +100,12 @@ def gainCONTENT(chapterurl):
 
 #各个slave开一个线程，专门负责爬取url，可以从一个start_url开始，将收集到的url发送到redis，set去重
 def gainUrl(starturlnum):
+    global closeflag
     print("收集url")
     baseurl = "http://www.jinyongwang.com/s/"
-    start=starturlnum
-    while start<30000:
-        gainBOOKurl(indexurl=(baseurl+start+'/'),header=header)
+    start=int(starturlnum)
+    while start<(int(starturlnum)+6000):
+        gainBOOKurl(indexurl=(baseurl+str(start)+'/'),header=header)
         start+=1
         print("gain index:",start)
         
@@ -97,13 +113,14 @@ def gainUrl(starturlnum):
     
 
 #各个salve开一个线程专门接收来自调度器的url，针对url执行爬取页面的操作,
-def gainPage(url,bookname):
+def gainPage(url):
     print("收集page内容")
     chaplist=gainCHAPTERurl(url)
     contentlist=[]
     for i in chaplist:
+        print("爬取 {}".format(i))
         content=[i[0],gainCONTENT(i[1])]
         contentlist.append(content)
-    return bookname,contentlist
+    return contentlist
         
    
