@@ -16,20 +16,6 @@ testContenturl=""
 header = {
     'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Mobile Safari/537.36 Edg/107.0.1418.42'
 }
-#获取初始urlnum，用来分配给slave
-def gainStartUrl(starturl,slaveNums=3):
-    print("gainStartUrl")
-    page = requests.get(url=starturl, headers=header)
-    html = etree.HTML(page.text)
-    part = html.xpath('//div[@class="pages"]')
-    section = etree.tostring(part[0], encoding="utf-8", pretty_print=True, method="html").decode("utf-8")
-    allcount = re.findall("&gt;&gt;</a><a href=.*>(.*)</a>", section)[0]
-    reslist=[]
-    for i in range(0,slaveNums):
-        reslist.append(int((int(allcount)/slaveNums)*i+1))
-    return reslist
-
-
 def cal_md5(url):
     md5_url = md5(url.encode('utf8')).hexdigest()
     print(md5_url)  # 2f7108ac307fd06f5995948f35a70f2f
@@ -41,6 +27,21 @@ def pushinredis(key, value, redisHandle, hashname):
     else:
         redisHandle.hset(hashname, key, str(value))
         print("save key:", key)
+
+
+
+#获取初始starturl，用来分配给slave
+def gainStartUrl(starturl,slaveNums=3):
+    print("gainStartUrl")
+    page = requests.get(url=starturl, headers=header)
+    html = etree.HTML(page.text)
+    part = html.xpath('//div[@class="pages"]')
+    section = etree.tostring(part[0], encoding="utf-8", pretty_print=True, method="html").decode("utf-8")
+    allcount = re.findall("&gt;&gt;</a><a href=.*>(.*)</a>", section)[0]
+    reslist=[]
+    for i in range(0,slaveNums):
+        reslist.append(int((int(allcount)/slaveNums)*i+1))
+    return reslist
 
 #获取该索引页的所有bookurl，md5入库redis
 def gainBOOKurl(indexurl, header=header):
@@ -54,14 +55,14 @@ def gainBOOKurl(indexurl, header=header):
         section = etree.tostring(part[i], encoding="utf-8", pretty_print=True, method="html").decode("utf-8")
         bookurl = re.findall("<a href=(.*)><h2>.*</h2></a>", section)[0]
         bookname = re.findall("<a href=.*><h2>(.*)</h2></a>", section)[0]
+        authorname=re.findall("&nbsp;(.*)</i>", section)[0]
         bookurl = baseurl+re.sub("\"", "", bookurl)
         #print(bookname, bookurl)
         md5key=cal_md5(bookurl)
-        value=bookname+"&&{}".format(bookurl)
+        value=bookname+"&&{}&&{}".format(authorname,bookurl)
         pushinredis(md5key,value,redisHandel,hashname)
 
-
-
+#获取book页的所有chapterurl
 def gainCHAPTERurl(bookurl):
     print("gainCHAPTERurl")
     page = requests.get(url=bookurl, headers=header)
@@ -76,9 +77,8 @@ def gainCHAPTERurl(bookurl):
         chapterList.append([chapterName,chapterUrl])
         print(chapterName,chapterUrl)
     return chapterList
-    
 
-
+#获取章节内容
 def gainCONTENT(chapterurl):
     print("gainCONTENT")
     page = requests.get(url=chapterurl, headers=header)
@@ -91,14 +91,7 @@ def gainCONTENT(chapterurl):
     chapterContent=re.sub("</p>|<p>",'',chapterContent)
     return chapterContent
 
-#gainBOOKurl(starturl, header)
-#gainCHAPTERurl(testbookurl)
-#print(gainCONTENT(chapterurl=chaptertesturl))
-#print(gainStartUrl(starturl))
-
-
-
-#各个slave开一个线程，专门负责爬取url，可以从一个start_url开始，将收集到的url发送到redis，set去重
+#接收master的start_url，将收集到的url发送到redis，set去重
 def gainUrl(starturlnum):
     global closeflag
     print("收集url")
@@ -108,11 +101,8 @@ def gainUrl(starturlnum):
         gainBOOKurl(indexurl=(baseurl+str(start)+'/'),header=header)
         start+=1
         print("gain index:",start)
-        
-        
-    
-
-#各个salve开一个线程专门接收来自调度器的url，针对url执行爬取页面的操作,
+            
+#接收来自调度器的bookurl，针对url执行爬取页面的操作,
 def gainPage(url):
     print("收集page内容")
     chaplist=gainCHAPTERurl(url)

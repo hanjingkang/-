@@ -1,7 +1,6 @@
 from hashlib import md5
 import random
 import os
-import ast
 import socket
 import threading
 import time
@@ -16,7 +15,7 @@ clientList = []
 syscore = [[0,0,0,0,0], [0,0,0,0,0],[0,0,0,0,0]]
 
 urlfinishflag=[]
-closeflag=False
+
 
 def findUrl2Slave(clientsockt):
     global redisHandel
@@ -30,7 +29,7 @@ def do_schedeler():
     global syscore
     global clientList
     while True:
-        time.sleep(60)
+        time.sleep(30)
         # 循环获取slave的sysscore
         print("do_schedeler")
         # 计算最空闲slave
@@ -45,6 +44,7 @@ def do_schedeler():
             print("choose slave2")
             findUrl2Slave(clientList[1])
         elif (target == s3):
+            # 向slave3分发50个url
             print("choose slave3")
             findUrl2Slave(clientList[2])
         
@@ -183,7 +183,7 @@ def server_task(clientsock, buffsize):
     global urlfinishflag
     while True:
         recvdata = clientsock.recv(buffsize).decode('utf-8')
-        # 从flask接受数据1：开启爬虫，2测试连接，3接收sysscore
+        # 1.开启爬虫
         if recvdata == '1':
             print("web call:start system")
             clientsock.send(("start system sucessful!").encode())
@@ -191,17 +191,18 @@ def server_task(clientsock, buffsize):
             t2 = threading.Thread(target=findUrl2Slave,args=(clientList[1],)) 
             t3 = threading.Thread(target=findUrl2Slave,args=(clientList[2],)) 
             t1.start()
-            time.sleep(10)
+            time.sleep(5)
             t2.start()
-            time.sleep(10)
+            time.sleep(5)
             t3.start()
 
             do_schedeler()
+        # 2.测试连接
         if recvdata == '2':
             print("web call:test connection")
             clientsock.send(("connect sucessful!").encode())
+        # 3 接收sysscore
         if recvdata == '3':
-            print("web call:ask slave sysScore")
             # targetclient=clientList[0]
             # targetclient.send(("3,").encode())
             # print("send 3")
@@ -213,7 +214,7 @@ def server_task(clientsock, buffsize):
             res.extend([syscore[0][4],syscore[1][4],syscore[2][4]])
             res.extend([syscore[0][3],syscore[1][3],syscore[2][3]])
             res.extend([redisHandel.hlen(hashname),syscore[0][2],syscore[1][2],syscore[2][2]])
-            print(len(res),res)
+            print(res)
             # res=testdata()
             clientsock.send(str(res).encode())
         #5.收集url
@@ -251,10 +252,7 @@ def server_task(clientsock, buffsize):
             clientList[0].send(("5,").encode())
             #clientList[1].send(("5,").encode())
             #clientList[2].send(("5,").encode())
-            clientsock.send(("stop spider task ok").encode())
-
-
-            
+            clientsock.send(("stop spider task ok").encode()) 
     clientsock.close()
 
 
@@ -271,7 +269,7 @@ def server(host, port):
     while True:
         clientsock, clientaddress = tcpSerSock.accept()
         clientList.append(clientsock)  # 前三个client是slave端,最后一个client是web端
-        print('connect from:', clientaddress)
+        #print('connect from:', clientaddress)
         t = threading.Thread(target=server_task, args=(
             clientsock, BUFSIZ))  # t为新创建的线程
         t.start()
@@ -285,17 +283,20 @@ def client_task_send2redis(startnum,servsock):
     print ("get all url ok ,then call server")
 
 
+
+
 def client_task_acceptUrl(bookurllist):
     global mytool
     global closeflag
     print("client线程之接受调度url,存数据存到mysql,参数:bookurllist")
     for item in bookurllist:
         bookname=item.split("&&")[0]
+        authorname="zuozhe"
         url=item.split("&&")[1]
         if(closeflag==False):
             contentlist = gainPage(url)
             print("爬完：",bookname,"一共{}章".format(len(contentlist)))
-            pushinMysql(mytool, bookname,"作者", len(contentlist), str(contentlist))
+            pushinMysql(mytool, bookname,authorname, len(contentlist), str(contentlist))
             print("save book {} ok".format(bookname))
         else:
             print("task already closed")
@@ -308,22 +309,12 @@ def client(host, port):
     PORT = port
     BUFSIZ = 1024
     ADDR = (HOST, PORT)
-
     tcpCliSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     tcpCliSock.connect(ADDR)
-    """ while True:
-        msg=input('>')
-        if(msg=="q"):
-            tcpCliSock.close()
-        tcpCliSock.send(bytes(msg, 'utf-8')) """
-
     while True:
         data = tcpCliSock.recv(5000)
         print("recv {} from server".format(data))
         data = data.decode('utf-8').split(",",1)
-
-        # 5.接受查询（待定）6.结束
-
         # 1.接收启动爬虫的启始地址 ,发送爬取的url到redis
         if (data[0] == "1"):
             closeflag=False
@@ -346,13 +337,11 @@ def client(host, port):
             print("cal_sysLoad:", res)
             tcpCliSock.send(bytes(str(res), 'utf-8'))
             print("send ok")
-
         #4.清理数据库
         if (data[0] == "4"):
             clearMysql(mytool)
             closeflag=False
             print("clearMysql ok")
-            
         #5.停止爬虫
         if (data[0] == "5"):
             closeflag=True
@@ -489,6 +478,7 @@ def dataserver():
         print('connect and from:', clientaddress)
         
     tcpSerSock.close()
+
 
 def dataclient():
     HOST = "192.168.112.143"  # HOST 变量是空白的，表示它可以使用任何可用的地址。

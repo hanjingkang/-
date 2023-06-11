@@ -1,14 +1,16 @@
 from denpendence import *
 
 
-#master端
-if(projectInfo.ifmaster==1 and projectInfo.ifslave==0):
+# master端
+if (projectInfo.ifmaster == 1 and projectInfo.ifslave == 0):
     print("master端")
-    #server(master_slaves.masterIP,master_slaves.masterPort)
-    mainservertask=threading.Thread(target=server,args=(master_slaves.masterIP,master_slaves.masterPort))
-    dataservertask=threading.Thread(target=dataserver)
+    # server(master_slaves.masterIP,master_slaves.masterPort)
+    mainservertask = threading.Thread(target=server, args=(
+        master_slaves.masterIP, master_slaves.masterPort))
+    dataservertask = threading.Thread(target=dataserver)
     mainservertask.start()
     dataservertask.start()
+
 
 #slave端
 elif(projectInfo.ifmaster==0 and projectInfo.ifslave==1):

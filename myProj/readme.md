@@ -24,3 +24,13 @@ sqlalchemy_utils
 1
 OSError: [Errno 113] No route to host
 服务端关闭防火墙systemctl stop firewalld
+
+
+mysql command：
+设置数据包大小限制问题
+etc/my.cnf添加：
+max_allowed_packet=30M
+重启sql
+
+service mysqld restart
+systemctl status mysqld
