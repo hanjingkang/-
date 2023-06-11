@@ -12,6 +12,7 @@ CORS(app, resources=r'/*')
 spider_data = [{'title': 'article 1', 'content': 'This is article 1.'}, {'title': 'article 2', 'content': 'This is article 2.'}]
 data = []
 
+# 测试链接爬虫
 @app.route('/test', methods=['POST'])
 def test_connect():
     #测试连接
@@ -26,10 +27,9 @@ def test_connect():
     print(globalClient)
     return data
 
-
+# 收集url指令
 @app.route('/url', methods=['GET'])
 def url():
-    # 在这里进行停止、重置的操作
     global globalClient
     global ifstartwork
     if(globalClient==None):
@@ -39,6 +39,7 @@ def url():
     print(data)
     return data
 
+#查询url数量
 @app.route('/checkstatus', methods=['GET'])
 def checkstatus():
     # 在这里进行停止、重置的操作
@@ -51,6 +52,7 @@ def checkstatus():
     print("check redis url nums:",data)
     return data
 
+#开启爬虫任务
 @app.route('/start', methods=['GET'])
 def start_spider():
     # 在这里进行开始爬虫的处理,
@@ -73,8 +75,7 @@ def start_spider():
     print(data)
     return data
 
-
-
+#停止爬虫任务
 @app.route('/stop', methods=['POST'])
 def stop():
     # 在这里进行停止、重置的操作
@@ -89,6 +90,7 @@ def stop():
     ifstartwork==False
     return data
 
+#重置数据库
 @app.route('/reset', methods=['POST'])
 def reset_data():
     # 在这里进行停止、重置的操作
@@ -105,9 +107,7 @@ def reset_data():
     ifstartwork==False
     return data
 
-
-
-
+#查询数据 (待实现)
 """ @app.route('/query', methods=['GET'])
 def query_data():
     # 在这里进行查询数据的处理
